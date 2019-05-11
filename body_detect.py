@@ -18,6 +18,14 @@ from scipy.spatial.distance import euclidean
 api_key = os.environ["fpAPI"]
 api_secret = os.environ["fpAPISecret"]
 
+# Represents a customer
+class Customer(object):
+    # the time series state of the person
+    activity_record = []
+    
+    def __init__(self, person):
+        self.activity_record.append(person)
+
 # Will match a face to a body using location of bounding box.
 # each face will be contained in a bounding of a BODY.
 # if face x,y in body x to x+width, y to y+height THEN it's a same person
@@ -117,18 +125,26 @@ def create_faceSet(tags):
 
 
 # Keeps track of faces in the Store across ALL cameras
-# used for TIME spent shopping PER customer
-# used for total COUNT of all customers in store
+# used for TIME spent shopping PER customer as well as demographic data via Tags
 #
 # called from get_faces
 # i) check if face exists -> compare API (tokens against FACESET)
 # ii) if not exist ADD new token
 def update_faceSet(faces):
-    for face in faces:
+    # get facesets for comparison
+    files = {
+    'api_key': (None, '<api_key>'),
+    'api_secret': (None, '<api_secret>'),
+    }
+
+    req = requests.post('https://api-us.faceplusplus.com/facepp/v3/faceset/getfacesets', files=files)
+    facesets = json.loads(req.text)
+
+    for face in faces['faces']:
         files = {
             'api_key': (None, '<api_key>'),
             'api_secret': (None, '<api_secret>'),
-            'face_token1': (None, 'c2fc0ad7c8da3af5a34b9c70ff764da0'),
+            'face_token1': (None, face['face_token']),
             'face_token2': (None, 'ad248a809408b6320485ab4de13fe6a9'),
         }
 
