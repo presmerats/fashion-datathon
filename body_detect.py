@@ -5,6 +5,15 @@ import operator
 import math
 from scipy.spatial.distance import euclidean
 
+## SET an environment script with your credentials
+# eg.
+# #!/bin/bash
+# export fpAPI=<yourAPI>
+# export fpAPISecret=<yourSecret>
+
+# THEN activate the environment
+# source <yourscript>.sh
+
 # load keys from environ
 api_key = os.environ["fpAPI"]
 api_secret = os.environ["fpAPISecret"]
