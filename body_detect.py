@@ -20,11 +20,18 @@ api_secret = os.environ["fpAPISecret"]
 
 # Represents a customer
 class Customer(object):
+
+    entry_time = None # customer first detected
+    last_update_time = None # customer state last updated
+    exit_time = None # considered exited after X timesteps of no update
+
     # the time series state of the person
     activity_record = []
     
-    def __init__(self, person):
+    def __init__(self, person, entry_time):
         self.activity_record.append(person)
+        self.entry_time = entry_time
+
 
 
 
@@ -144,10 +151,25 @@ def update_faceSet(faces):
 
         response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
 
+# Process people takes all the new identified people (body/face pair) in the last frame
+# and will see if (based on position) this person is NEW or part of the last frame
+# IF new, then it will create a new customer record
+# ELSE, will add the persons current tuple state to the existing customer record.
+def process_people(people):
+    # iterate through all the new people in frame
+    for person in people:
+        body = person[1] # persons body
+        body_coords = body['humanbody_rectangle']
+        #print(body['humanbody_rectangle'])
+        
+        # check euclidean to people in 
+        for cust in customers:
+    # return 0
 
 
 #============ Program Start
 
+customers = []
 totalNumberCustomers = None
 facesetTokens = {}
 
@@ -168,3 +190,5 @@ print(totalNumberCustomers)
 # match the faces and bodies
 people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
 #print(people)
+
+process_people(people)
