@@ -163,8 +163,6 @@ def process_people(people):
     # Initially there are NO customers so we take all in the frame
     if globalTimeStep <= 1:
         for person in people:
-            #print("PERSON===")
-            #print(person)
             customers.append(Customer(person, globalTimeStep))
 
     # # Filter customers to process (will only look for customers who were updates in that last timestep)
@@ -187,7 +185,9 @@ def processFrame(filename='./frames/shopCouple.jpg'):
 
     globalTimeStep += 1
     faces = get_faces(filename)
+    #print(faces)
     bodies = get_bodies(filename)
+    #print(bodies)
 
     # Update totalNumberCustomers
     totalNumberCustomers = len(bodies['humanbodies'])
@@ -205,11 +205,9 @@ def processFrame(filename='./frames/shopCouple.jpg'):
 facesetTokens['male'] = create_faceSet("male")["faceset_token"]
 facesetTokens['female'] = create_faceSet("female")["faceset_token"]
 
-processFrame()
-
-print(customers[0])
-
-print("------------")
-print(customers[1])
-
-#print(customers)
+count = 0
+for filename in os.listdir("./Retail/women01/"):
+    count += 1
+    processFrame("./Retail/women01/"+filename)
+    if count > 0:
+        break
