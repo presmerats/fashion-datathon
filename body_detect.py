@@ -18,20 +18,23 @@ from scipy.spatial.distance import euclidean
 api_key = os.environ["fpAPI"]
 api_secret = os.environ["fpAPISecret"]
 
+# GLOBALS ================================
+globalTimeStep = 0 # track updates by timestep
+customers = [] # list of Customer Objects
+totalNumberCustomers = None
+facesetTokens = {} # used for faceSets
+
 # Represents a customer
 class Customer(object):
-
-    entry_time = None # customer first detected
-    last_update_time = None # customer state last updated
-    exit_time = None # considered exited after X timesteps of no update
-
-    # the time series state of the person
-    activity_record = []
     
     def __init__(self, person, entry_time):
-        self.activity_record.append(person)
-        self.entry_time = entry_time
+        self.activity_record = [person] # customer first detected
+        self.entry_time = entry_time # customer state last updated
+        self.last_update_time = entry_time # considered exited after X timesteps of no update
+        self.exit_time = None
 
+    def __repr__(self):
+        return(f"entry {self.entry_time}, last_update {self.last_update_time}, exit {self.exit_time}, {self.activity_record}")
 
 
 
@@ -67,7 +70,7 @@ def match_faces_to_bodies(faces, bodies):
     return people
 
 # Calls API to return features of faces in the frame
-def get_faces(filename='./frames/shopCouple.jpg'):
+def get_faces(filename):
     # gender
     # age
     # smiling
@@ -98,7 +101,7 @@ def get_faces(filename='./frames/shopCouple.jpg'):
         print("Error")
 
 # Calls API to return features of bodies in the frame
-def get_bodies(filename='./frames/shopCouple.jpg'):
+def get_bodies(filename):
 
     files = {
         'api_key': (None, api_key),
@@ -156,39 +159,57 @@ def update_faceSet(faces):
 # IF new, then it will create a new customer record
 # ELSE, will add the persons current tuple state to the existing customer record.
 def process_people(people):
-    # iterate through all the new people in frame
-    for person in people:
-        body = person[1] # persons body
-        body_coords = body['humanbody_rectangle']
-        #print(body['humanbody_rectangle'])
-        
-        # check euclidean to people in 
-        for cust in customers:
-    # return 0
+    global customers
+    # Initially there are NO customers so we take all in the frame
+    if globalTimeStep <= 1:
+        for person in people:
+            #print("PERSON===")
+            #print(person)
+            customers.append(Customer(person, globalTimeStep))
 
+    # # Filter customers to process (will only look for customers who were updates in that last timestep)
+    # customers_prevFrame = [cust for customers if cust.last_update_time == globalTimeStep-1]
+
+    # # iterate through all the new people in frame
+    # for person in people:
+    #     body = person[1] # persons body
+    #     body_coords = body['humanbody_rectangle']
+    #     print(body['humanbody_rectangle'])
+        
+    #     check euclidean to people in 
+    #     for cust in customers:
+    #return 0
+
+# NOTE: we do not need to update at EVERY frame. To save time we will call updates every X
+# seconds and then use the intermediate time to process the result with Compare API etc.
+def processFrame(filename='./frames/shopCouple.jpg'):
+    global globalTimeStep
+
+    globalTimeStep += 1
+    faces = get_faces(filename)
+    bodies = get_bodies(filename)
+
+    # Update totalNumberCustomers
+    totalNumberCustomers = len(bodies['humanbodies'])
+    print(totalNumberCustomers)
+
+    # match the faces and bodies
+    people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
+    #print(people)
+    #print("PEOPLE------------------")
+    process_people(people)
 
 #============ Program Start
-
-customers = []
-totalNumberCustomers = None
-facesetTokens = {}
 
 # create facesets to individualy track males and females
 facesetTokens['male'] = create_faceSet("male")["faceset_token"]
 facesetTokens['female'] = create_faceSet("female")["faceset_token"]
-print(facesetTokens)
 
-# NOTE: we do not need to update at EVERY frame. To save time we will call updates every X
-# seconds and then use the intermediate time to process the result with Compare API etc.
-faces = get_faces()
-bodies = get_bodies()
+processFrame()
 
-# Update totalNumberCustomers
-totalNumberCustomers = len(bodies['humanbodies'])
-print(totalNumberCustomers)
+print(customers[0])
 
-# match the faces and bodies
-people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
-#print(people)
+print("------------")
+print(customers[1])
 
-process_people(people)
+#print(customers)
