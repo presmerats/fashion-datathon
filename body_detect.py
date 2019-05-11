@@ -101,15 +101,63 @@ def get_bodies(filename='./frames/shopCouple.jpg'):
     except Exception:
         print("Error")
 
+# Create a faceset for the PARAM: camera
+# facesets can contain 'tags' which can then be queried to return all faceset with that tag
+def create_faceSet(tags):
 
+    files = {
+        'api_key': (None, api_key),
+        'api_secret': (None, api_secret),
+        'tag': (None, 'person,'+tags),
+    }
+
+    try: # connection for POST
+        req = requests.post('https://api-us.faceplusplus.com/facepp/v3/faceset/create', files=files)
+
+        return json.loads(req.text)
+
+    except Exception:
+        print("Error")
+
+
+# Keeps track of faces in the Store across ALL cameras
+# used for TIME spent shopping PER customer
+# used for total COUNT of all customers in store
+#
+# called from get_faces
+# i) check if face exists -> compare API (tokens against FACESET)
+# ii) if not exist ADD new token
+def update_faceSet(faces):
+
+    files = {
+        'api_key': (None, '<api_key>'),
+        'api_secret': (None, '<api_secret>'),
+        'face_token1': (None, 'c2fc0ad7c8da3af5a34b9c70ff764da0'),
+        'face_token2': (None, 'ad248a809408b6320485ab4de13fe6a9'),
+    }
+
+    response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
+
+
+
+#============ Program Start
+
+# create facesets to individualy track males and females
+print(create_faceSet("male"))
+create_faceSet("female")
+
+
+# NOTE: we do not need to update at EVERY frame. To save time we will call updates every X
+# seconds and then use the intermediate time to process the result with Compare API etc.
 faces = get_faces("./frames/pau1.jpg")
-#print(faces)
 bodies = get_bodies("./frames/pau1.jpg")
-#print(bodies)
 
 # match the faces and bodies
 people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
 print(people)
+
+
+
 
 # NOTE that for upper / lower body colors we also have the option to grab RGB
 # for human in people['humanbodies']:
