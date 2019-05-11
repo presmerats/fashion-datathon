@@ -61,7 +61,7 @@ def get_faces(filename='./frames/shopCouple.jpg'):
     files = {
         'api_key': (None, api_key),
         'api_secret': (None, api_secret),
-        'image_file': ('image_file.jpg', open('./frames/shopCouple.jpg', 'rb')),
+        'image_file': ('image_file.jpg', open(filename, 'rb')),
         'return_attributes': (None, attributes),
     }
 
@@ -93,10 +93,12 @@ def get_bodies(filename='./frames/shopCouple.jpg'):
         print("Error")
 
 
-faces = get_faces()
-bodies = get_bodies()
+faces = get_faces("./frames/pau1.jpg")
+#print(faces)
+bodies = get_bodies("./frames/pau1.jpg")
+#print(bodies)
 
-# math the faces and bodies
+# match the faces and bodies
 people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
 print(people)
 
