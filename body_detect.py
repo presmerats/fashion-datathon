@@ -14,7 +14,7 @@ from scipy.spatial.distance import euclidean
 # THEN activate the environment
 # source <yourscript>.sh
 
-# load keys from environ
+# load keys from environment
 api_key = os.environ["fpAPI"]
 api_secret = os.environ["fpAPISecret"]
 
@@ -37,12 +37,11 @@ def match_faces_to_bodies(faces, bodies):
         for idx, body in enumerate(bodies):
             bodyLocation = body['humanbody_rectangle']
             dist = euclidean([faceLocation["top"],faceLocation['left']], [bodyLocation['top'], bodyLocation["left"]]) 
-            print(f"DIST ==== {dist}")
+
             if dist < minDistance:
                 minDistance = dist
                 minIdx = idx
 
-        print(minIdx)
         # add face/body store (IDS)
         people.append((face,bodies[minIdx]))
         # remove the matched body from body LIST
@@ -76,7 +75,6 @@ def get_faces(filename='./frames/shopCouple.jpg'):
 
     try: # connection for POST
         req = requests.post('https://api-us.faceplusplus.com/facepp/v3/detect', files=files)
-
         return json.loads(req.text)
 
     except Exception:
@@ -95,7 +93,6 @@ def get_bodies(filename='./frames/shopCouple.jpg'):
 
     try: # connection for POST
         req = requests.post('https://api-us.faceplusplus.com/humanbodypp/v1/detect', files=files)
-
         return json.loads(req.text)
 
     except Exception:
@@ -113,7 +110,6 @@ def create_faceSet(tags):
 
     try: # connection for POST
         req = requests.post('https://api-us.faceplusplus.com/facepp/v3/faceset/create', files=files)
-
         return json.loads(req.text)
 
     except Exception:
@@ -128,41 +124,37 @@ def create_faceSet(tags):
 # i) check if face exists -> compare API (tokens against FACESET)
 # ii) if not exist ADD new token
 def update_faceSet(faces):
+    for face in faces:
+        files = {
+            'api_key': (None, '<api_key>'),
+            'api_secret': (None, '<api_secret>'),
+            'face_token1': (None, 'c2fc0ad7c8da3af5a34b9c70ff764da0'),
+            'face_token2': (None, 'ad248a809408b6320485ab4de13fe6a9'),
+        }
 
-    files = {
-        'api_key': (None, '<api_key>'),
-        'api_secret': (None, '<api_secret>'),
-        'face_token1': (None, 'c2fc0ad7c8da3af5a34b9c70ff764da0'),
-        'face_token2': (None, 'ad248a809408b6320485ab4de13fe6a9'),
-    }
-
-    response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
+        response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
 
 
 
 #============ Program Start
 
-# create facesets to individualy track males and females
-print(create_faceSet("male"))
-create_faceSet("female")
+totalNumberCustomers = None
+facesetTokens = {}
 
+# create facesets to individualy track males and females
+facesetTokens['male'] = create_faceSet("male")["faceset_token"]
+facesetTokens['female'] = create_faceSet("female")["faceset_token"]
+print(facesetTokens)
 
 # NOTE: we do not need to update at EVERY frame. To save time we will call updates every X
 # seconds and then use the intermediate time to process the result with Compare API etc.
-faces = get_faces("./frames/pau1.jpg")
-bodies = get_bodies("./frames/pau1.jpg")
+faces = get_faces()
+bodies = get_bodies()
+
+# Update totalNumberCustomers
+totalNumberCustomers = len(bodies['humanbodies'])
+print(totalNumberCustomers)
 
 # match the faces and bodies
 people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
-print(people)
-
-
-
-
-# NOTE that for upper / lower body colors we also have the option to grab RGB
-# for human in people['humanbodies']:
-#     sex = human['attributes']['gender']
-#     upper_body_cloth_color = human['attributes']['upper_body_cloth']#['upper_body_cloth_color']
-#     lower_body_cloth_color = human['attributes']['lower_body_cloth']#['lower_body_cloth_color']
-#     rectangle = human['humanbody_rectangle']
-#     #print(f"rectangle: {rectangle}, sex: {sex}, upper: {upper_body_cloth_color}, lower: {lower_body_cloth_color}")
+#print(people)
