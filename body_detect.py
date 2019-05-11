@@ -106,51 +106,6 @@ def get_bodies(filename='./frames/shopCouple.jpg'):
     except Exception:
         print("Error")
 
-# Create a faceset for the PARAM: camera
-# facesets can contain 'tags' which can then be queried to return all faceset with that tag
-def create_faceSet(tags):
-
-    files = {
-        'api_key': (None, api_key),
-        'api_secret': (None, api_secret),
-        'tag': (None, 'person,'+tags),
-    }
-
-    try: # connection for POST
-        req = requests.post('https://api-us.faceplusplus.com/facepp/v3/faceset/create', files=files)
-        return json.loads(req.text)
-
-    except Exception:
-        print("Error")
-
-
-# Keeps track of faces in the Store across ALL cameras
-# used for TIME spent shopping PER customer as well as demographic data via Tags
-#
-# called from get_faces
-# i) check if face exists -> compare API (tokens against FACESET)
-# ii) if not exist ADD new token
-def update_faceSet(faces):
-    # get facesets for comparison
-    files = {
-    'api_key': (None, '<api_key>'),
-    'api_secret': (None, '<api_secret>'),
-    }
-
-    req = requests.post('https://api-us.faceplusplus.com/facepp/v3/faceset/getfacesets', files=files)
-    facesets = json.loads(req.text)
-
-    for face in faces['faces']:
-        files = {
-            'api_key': (None, '<api_key>'),
-            'api_secret': (None, '<api_secret>'),
-            'face_token1': (None, face['face_token']),
-            'face_token2': (None, 'ad248a809408b6320485ab4de13fe6a9'),
-        }
-
-        response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
-
-
 
 #============ Program Start
 
