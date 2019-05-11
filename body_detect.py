@@ -18,6 +18,16 @@ from scipy.spatial.distance import euclidean
 api_key = os.environ["fpAPI"]
 api_secret = os.environ["fpAPISecret"]
 
+# Represents a customer
+class Customer(object):
+    # the time series state of the person
+    activity_record = []
+    
+    def __init__(self, person):
+        self.activity_record.append(person)
+
+
+
 # Will match a face to a body using location of bounding box.
 # each face will be contained in a bounding of a BODY.
 # if face x,y in body x to x+width, y to y+height THEN it's a same person
@@ -98,8 +108,6 @@ def get_bodies(filename='./frames/shopCouple.jpg'):
     except Exception:
         print("Error")
 
-<<<<<<< HEAD
-=======
 # Create a faceset for the PARAM: camera
 # facesets can contain 'tags' which can then be queried to return all faceset with that tag
 def create_faceSet(tags):
@@ -137,7 +145,6 @@ def update_faceSet(faces):
         response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
 
 
->>>>>>> parent of 7b71330... will remove facesets for body detection tracking
 
 #============ Program Start
 
