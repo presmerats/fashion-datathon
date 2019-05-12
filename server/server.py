@@ -1,34 +1,34 @@
 from flask import Flask, jsonify, render_template, request
 import time
+import json
+from flask_cors import CORS, cross_origin
+
 app = Flask(__name__)
 
 @app.route("/")
 def main():
-    return render_template('main.html', reload = time.time())
+    with open('server/data/demo.json') as json_file:
+        data = json.load(json_file)
 
-@app.route("/api/info")
-def api_info():
-    info = {
-       "ip" : "127.0.0.1",
-       "hostname" : "everest",
-       "description" : "Main server",
-       "load" : [ 3.21, 7, 14 ]
-    }
-    return jsonify(info)
+    data2 = json.dumps(data, ensure_ascii=False)
+    print(data['people'])
+    print(type(data['people']))
+    return render_template('main.html', my_data=data['people'])
 
-@app.route("/api/calc")
+
+
+@app.route("/table")
 def add():
-    a = int(request.args.get('a', 0))
-    b = int(request.args.get('b', 0))
-    div = 'na'
-    if b != 0:
-        div = a/b
-    return jsonify({
-        "a"        :  a,
-        "b"        :  b,
-        "add"      :  a+b,
-        "multiply" :  a*b,
-        "subtract" :  a-b,
-        "divide"   :  div,
-    })
-    
+    with open('server/data/demo.json') as json_file:
+        data = json.load(json_file)
+
+    return json.dumps(data, ensure_ascii=False)
+"""
+with open('server/data/demo.json') as json_file:
+    data = json.load(json_file)
+    print(data) # tal cual el archivo
+
+
+
+    render_template('template.html', my_string="Wheeeee!", my_list=[0,1,2,3,4,5])
+"""

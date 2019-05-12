@@ -1,21 +1,33 @@
 <html>
 <head>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.0.min.js"></script>
 </head>
 <body>
-<input type="number" id="a">
-<input type="number" id="b">
-<button id="calc">Calc</button>
-<div id="results">
-   <div id="add"></div>
-   <div id="subtract"></div>
-   <div id="multiply"></div>
-   <div id="divide"></div>
-</div>
 
-<pre id="info"></pre>
-<div id="description"></div>
 
-<script src="/static/jquery-3.1.1.min.js"></script>
-<script src="/static/math.js?r={{reload}}"></script>
+
+<script type="text/javascript" src="/static/math.js?r={{reload}}"></script>
+
+
+<table id="data_table">
+<tbody>
+<tr>
+<td>ID</td>
+<td>Coordinates</td>
+<td>Image</td>
+</tr>
+
+{% for p in my_data %}
+    <tr>
+	<td>{{ p.id }}</td>
+	<td>{{ p.coord.x}}  {{p.coord.y }}</td>
+	<td> <img src={{ p.img }} height="100" width="80"></td>
+	</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
 </body>
 </html>
