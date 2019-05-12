@@ -599,8 +599,8 @@ def hackathon_action(i,image, pred_coords, class_IDs, bounding_boxs, scores, box
     detected_action, x, y = actionArmsRaised(pred_coords, bounding_boxs)
     #print("bboxs: ",pred_coords)
     coord = {
-      "x": float(pred_coords[0,0,0].asnumpy()),
-      "y": float(pred_coords[0,0,0].asnumpy())
+      "x": round(float(pred_coords[0,0,0].asnumpy()),0),
+      "y": round(float(pred_coords[0,0,0].asnumpy()),0)
     }
 
     if detected_action:
