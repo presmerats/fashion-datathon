@@ -1,0 +1,20 @@
+{
+"people":[
+	{
+		"id": 1,
+		"coord": {
+			"x": 0,
+			"y": 0
+		},
+		"img": "static/frames/images.jpeg"
+	},
+	{
+		"id": 2,
+		"coord": {
+			"x": 0,
+			"y": 0
+		},
+		"img": "static/frames/pau1.jpg"
+	}
+]
+}
