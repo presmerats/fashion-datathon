@@ -37,18 +37,16 @@ $(document).ready(function(){
         });
 */
     
+
 $(document).ready(function(){
-    $('#calc').click(function() {
-        console.log("Hello1");
-        $.ajax({
-            url: 'localhost:5000/table',
-            success: function(data) {
-                    console.log("Hello");
-                    /*var table = document.getElementById("myTable");
-                    data['people'].forEach(function(elem){
-                        console.log(elem);
-                    });*/
-            } 
-        });
-    });
+   setInterval(function(){ // load the data from your endpoint into the div
+    //$("#content").load("/")
+    cache_clear()
+    console.log("hello")
+    },1000);
 });
+
+function cache_clear() {
+    window.location.reload(true);
+}
+

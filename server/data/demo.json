@@ -1,1 +1,27 @@
-{"people": [{"id": 1, "coord": {"x": 10, "y": 20}, "img": "static/frames/camiseta_blanca.png", "gender": "Male", "ethnicity": "White", "emotion": "Happy"}, {"id": 2, "coord": {"x": 128, "y": 87}, "img": "static/frames/camiseta_roja.jpeg", "gender": "Male", "ethnicity": "White", "emotion": "Happy"}, {"id": 1, "coord": {"x": 197.03652954101562, "y": 197.03652954101562}, "img": "static/frames/camiseta_blanca.png", "gender": "angel", "ethnicity": "unknown", "emotion": "unknown", "activity": "passive"}, {"id": 2, "coord": {"x": 215.16464233398438, "y": 215.16464233398438}, "img": "static/frames/camiseta_blanca.png", "gender": "angel", "ethnicity": "unknown", "emotion": "unknown", "activity": "passive"}, {"id": 3, "coord": {"x": 196.61611938476562, "y": 196.61611938476562}, "img": "static/frames/camiseta_blanca.png", "gender": "angel", "ethnicity": "unknown", "emotion": "unknown", "activity": "passive"}, {"id": 4, "coord": {"x": 201.46969604492188, "y": 201.46969604492188}, "img": "static/frames/camiseta_blanca.png", "gender": "angel", "ethnicity": "unknown", "emotion": "unknown", "activity": "passive"}, {"id": 5, "coord": {"x": 131.54393005371094, "y": 131.54393005371094}, "img": "static/frames/camiseta_roja.jpeg", "gender": "Male", "ethnicity": "ASIAN", "emotion": "coldice", "activity": "passive"}, {"id": 6, "coord": {"x": 136.37213134765625, "y": 136.37213134765625}, "img": "static/frames/camiseta_blanca.png", "gender": "Male", "ethnicity": "ASIAN", "emotion": "coldice", "activity": "passive"}, {"id": 7, "coord": {"x": 123.00658416748047, "y": 123.00658416748047}, "img": "static/frames/camiseta_blanca.png", "gender": "Male", "ethnicity": "ASIAN", "emotion": "coldice", "activity": "passive"}]}
+{
+    "people": [
+        {
+            "id": 1,
+            "coord": {
+                "x": 10,
+                "y": 20
+            },
+            "img": "static/frames/camiseta_blanca.png",
+            "gender": "Male",
+            "ethnicity": "White",
+            "emotion": "Happy"
+        },
+        {
+            "id": 2,
+            "coord": {
+                "x": 128,
+                "y": 87
+            },
+            "img": "static/frames/camiseta_roja.jpeg",
+            "gender": "Male",
+            "ethnicity": "White",
+            "emotion": "Happy"
+        }
+        
+    ]
+}
