@@ -3,18 +3,24 @@
 	{
 		"id": 1,
 		"coord": {
-			"x": 0,
-			"y": 0
+			"x": 10,
+			"y": 20
 		},
-		"img": "static/frames/images.jpeg"
+		"img": "static/frames/camiseta_blanca.png",
+		"gender": "Male",
+		"ethnicity": "White",
+		"emotion": "Happy"
 	},
 	{
 		"id": 2,
 		"coord": {
-			"x": 0,
-			"y": 0
+			"x": 128,
+			"y": 87
 		},
-		"img": "static/frames/pau1.jpg"
+		"img": "static/frames/camiseta_roja.jpeg",
+		"gender": "Male",
+		"ethnicity": "White",
+		"emotion": "Happy"
 	}
 ]
 }
