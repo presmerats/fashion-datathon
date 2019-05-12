@@ -8,20 +8,26 @@
 
 <script type="text/javascript" src="/static/math.js?r={{reload}}"></script>
 
-
 <table id="data_table">
 <tbody>
 <tr>
 <td>ID</td>
+<td>Ethnicity</td>
+<td>Gender</td>
+<td>Emotion</td>
 <td>Coordinates</td>
 <td>Image</td>
+
 </tr>
 
 {% for p in my_data %}
     <tr>
 	<td>{{ p.id }}</td>
+	<td>{{ p.ethnicity }}</td>
+	<td>{{ p.gender }}</td>
+	<td>{{ p.emotion }}</td>
 	<td>{{ p.coord.x}}  {{p.coord.y }}</td>
-	<td> <img src={{ p.img }} height="100" width="80"></td>
+	<td> <img src={{ p.img }} height="150" width="100"></td>
 	</tr>
 
 {% endfor %}
