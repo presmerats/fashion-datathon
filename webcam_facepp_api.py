@@ -482,7 +482,7 @@ def actionArmsRaisedSVM(pred_coords, upscale_bbox):
     
   #print(poses_np)
   
-  result = loaded_model.predict(poses_np)
+  #result = loaded_model.predict(poses_np)
   #print(result)
   
   return result == 1
@@ -585,8 +585,8 @@ if __name__ == '__main__':
 
     # action recognition model
     global loaded_model
-    filename = 'action_recognition_svm_local.sav'
-    loaded_model = pickle.load(open(filename, 'rb'))
+    #filename = 'action_recognition_svm_local.sav'
+    #loaded_model = pickle.load(open(filename, 'rb'))
 
     # webcam loop
     ctx = mx.cpu()
