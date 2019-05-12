@@ -96,7 +96,7 @@ def match_faces_to_bodies(faces, bodies):
 
     return people
 
-def write(img_arr, flag=1, output_format='jpeg', dim_order='CHW'):
+def write(img_arr, flag=1, output_format='jpeg', dim_order='HWC'):
     """
     Write an NDArray to a base64 string.
     :param img_arr: NDArray
@@ -110,6 +110,8 @@ def write(img_arr, flag=1, output_format='jpeg', dim_order='CHW'):
     :return: str
         Image in base64 string format
     """
+
+    print(img_arr.size)
     assert dim_order in 'CHW' or dim_order in 'HWC', "dim_order must be 'CHW' or 'HWC'."
     if dim_order == 'CHW':
         img_arr = mx.nd.transpose(img_arr, (1, 2, 0))
@@ -133,11 +135,11 @@ def encodeBase64Image(image):
   #encoded_string = base64.b64encode(image)
   #image = mx.img#.imdecode(image)
 
-  transformer = transforms.Resize(size=(1000, 500))
+  transformer = transforms.Resize(size=(128, 128),keep_ratio=True)
   #image = mx.nd.random.uniform(0, 255, (224, 224, 3)).astype(dtype=np.uint8)
   img2 = transformer(image)
 
-  encoded_string = write(image)
+  encoded_string = write(img2)
   return encoded_string
 
 # Calls API to return features of faces in the frame
@@ -268,7 +270,10 @@ def processFrame(image):
 
     print(bodies.keys())
     print(faces.keys())
-    print(faces['error_message'])
+    try:
+      print(faces['humanbodies'])
+    except:
+      pass
     print()
 
     # Update totalNumberCustomers
@@ -290,6 +295,9 @@ def processFrame(image):
 def facepp_plugin(image):
     
     customers = processFrame(image)
+
+    if customers is None:
+      return
 
     # print intersting stuff
     for customer in customers:
@@ -538,7 +546,7 @@ def hackathon_action(image, pred_coords, class_IDs, bounding_boxs, scores, box_t
 
 def keypoint_detection(frame, detector, pose_net, ctx=mx.cpu(), axes=None):
     
-    pause_time = 1.0 # 0.001 #3.0 #0.001
+    pause_time = 0.4 #3.0 #0.001
 
     x, img = gcv.data.transforms.presets.yolo.transform_test(frame, short=512, max_size=350)
     x = x.as_in_context(ctx)
@@ -596,8 +604,8 @@ if __name__ == '__main__':
     net = get_model('simple_pose_resnet18_v1b', pretrained='ccd24037', ctx=ctx)
 
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 48)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 48)
+    #cap.set(cv2.CAP_PROP_FRAME_WIDTH, 48)
+    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 48)
     time.sleep(1)  ### letting the camera autofocus
     axes = None
 
