@@ -1,12 +1,1 @@
-
-frame processed! with 1 
-frame processed! with 1 
-unknown angel unknown unknown action: False
-frame processed! with 1 
-unknown angel unknown unknown action: False
-frame processed! with 1 
-unknown angel unknown unknown action: False
-frame processed! with 1 
-unknown angel unknown unknown action: False
-frame processed! with 0 
-frame processed! with 0 
+{"people": [{"id": 1, "coord": {"x": 219.29434204101562, "y": 219.29434204101562}, "img": "static/frames/camiseta_blanca.png", "gender": "angel", "ethnicity": "unknown", "emotion": "unknown", "activity": "passive"}, {"id": 2, "coord": {"x": 218.75, "y": 218.75}, "img": "static/frames/camiseta_roja.jpeg", "gender": "Male", "ethnicity": "ASIAN", "emotion": "coldice", "activity": "passive"}, {"id": 3, "coord": {"x": 189.0901336669922, "y": 189.0901336669922}, "img": "static/frames/camiseta_blanca.png", "gender": "angel", "ethnicity": "unknown", "emotion": "unknown", "activity": "passive"}]}

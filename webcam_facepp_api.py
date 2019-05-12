@@ -307,18 +307,49 @@ def processFrame(image):
 
 #===========plugin api
 
-def writeToDb(dbrecord):
+def writeToDb(ethnicity , gender , emotion , outfit , action, coord):
 
-  with open('trackingCustomer.db','a') as f:
 
-    f.write(dbrecord)
 
-def facepp_plugin(image,action):
+  filedict = {}
+  with open('trackingCustomer.db','r') as f:
+    filedict = json.load(f)
+
+  global newid
+  newid+=1
+
+  activity = "passive"
+  if action:
+    activity="active"
+
+
+  selectimg = "static/frames/camiseta_blanca.png"
+  #selectimg = "static/frames/camiseta_negra.jpeg"
+  if outfit in ["purple"]:
+    selectimg = "static/frames/camiseta_roja.jpeg"
+  
+  person = {
+    "id": newid,
+    "coord" : coord,
+    "img": selectimg,
+    "gender": gender,
+    "ethnicity": ethnicity,
+    "emotion": emotion,
+    "activity": activity
+  }
+  pprint(person)
+  filedict["people"].append(person)
+
+  with open('trackingCustomer.db','w') as f:
+    json.dump(filedict,fp=f)
+    
+
+def facepp_plugin(image,action, coord):
 
     global api_ready
     api_ready = False
     people = processFrame(image)
-    writeToDb("frame processed! with {} \n".format(len(people)))
+    print("frame processed! with {} \n".format(len(people)))
     api_ready = True
 
     if people is None or len(people)==0:
@@ -333,8 +364,8 @@ def facepp_plugin(image,action):
       if body is not None:
 
         body = customer[1]['attributes']
-        outfit = str(body['lower_body_cloth']['lower_body_cloth_color']) + \
-           "_" + str(body['upper_body_cloth']['upper_body_cloth_color']) 
+        outfit = str(body['lower_body_cloth']['lower_body_cloth_color']) #+ \
+        #   "_" + str(body['upper_body_cloth']['upper_body_cloth_color']) 
       else:
         outfit = "nude"
 
@@ -357,9 +388,8 @@ def facepp_plugin(image,action):
         emotion = "unknown"
         gender = "angel"
 
-      dbrecord = ethnicity + " "+ gender + " " + emotion + " " + outfit + " action: "+ str(action) +"\n"
-      print(dbrecord)
-      writeToDb(dbrecord)
+      
+      writeToDb(ethnicity , gender , emotion , outfit , action, coord)
 
     
 
@@ -567,6 +597,12 @@ def hackathon_action(i,image, pred_coords, class_IDs, bounding_boxs, scores, box
 
     #print(pred_coords, class_IDs, bounding_boxs, scores, "\n")
     detected_action, x, y = actionArmsRaised(pred_coords, bounding_boxs)
+    #print("bboxs: ",pred_coords)
+    coord = {
+      "x": float(pred_coords[0,0,0].asnumpy()),
+      "y": float(pred_coords[0,0,0].asnumpy())
+    }
+
     if detected_action:
         print(" Touching at ({}, {}) !".format(x[0],y[0]))
         pprint(pred_coords)
@@ -580,7 +616,7 @@ def hackathon_action(i,image, pred_coords, class_IDs, bounding_boxs, scores, box
       print(api_ready)
       if i % int(50) == 0 and api_ready:
         # attributes and outfit
-        x = threading.Thread(target=facepp_plugin, args=(image,detected_action))
+        x = threading.Thread(target=facepp_plugin, args=(image,detected_action,coord))
         x.start()
         
     except  Exception:
@@ -626,7 +662,7 @@ def keypoint_detection(i,frame, detector, pose_net, ctx=mx.cpu(), axes=None):
             pred_coords, 
             confidence, 
             class_IDs, 
-            bounding_boxs, 
+            upscale_bbox, 
             scores)
 
 
@@ -644,7 +680,8 @@ def keypoint_detection(i,frame, detector, pose_net, ctx=mx.cpu(), axes=None):
 
 if __name__ == '__main__':
 
-
+    global newid
+    newid=0
     # facepp
     facepp_plugin_setup()
 
