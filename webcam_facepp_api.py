@@ -111,7 +111,7 @@ def write(img_arr, flag=1, output_format='jpeg', dim_order='HWC'):
         Image in base64 string format
     """
 
-    print(img_arr.size)
+    #print(img_arr.size)
     assert dim_order in 'CHW' or dim_order in 'HWC', "dim_order must be 'CHW' or 'HWC'."
     if dim_order == 'CHW':
         img_arr = mx.nd.transpose(img_arr, (1, 2, 0))
@@ -252,10 +252,13 @@ def process_people(people):
     #     for cust in customers:
     #return 0
 
+
+
 # NOTE: we do not need to update at EVERY frame. To save time we will call updates every X
 # seconds and then use the intermediate time to process the result with Compare API etc.
 def processFrame(image):
     global globalTimeStep
+    global customers
 
     customers = []
 
@@ -268,35 +271,36 @@ def processFrame(image):
     #print(bodies.keys())
     #print()
 
-    print(bodies.keys())
-    print(faces.keys())
-    try:
-      print(faces['humanbodies'])
-    except:
-      pass
-    print()
+    # print(bodies.keys())
+    # print(faces.keys())
+    # try:
+    #   print(faces['humanbodies'])
+    # except:
+    #   pass
+    # print()
 
     # Update totalNumberCustomers
-    if 'humanbodies' in bodies.keys():
+    if 'humanbodies' in bodies.keys() and 'faces' in faces.keys():
       totalNumberCustomers = len(bodies['humanbodies'])
-      #print(totalNumberCustomers)
+      print(totalNumberCustomers)
 
       # match the faces and bodies
       people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
-      #print(people)
+      print(people)
       #print("PEOPLE------------------")
-      customers = process_people(people)
+      #process_people(people)
+      return people
 
-    return customers
+    return []
 
 
 #===========plugin api
 
 def facepp_plugin(image):
     
-    customers = processFrame(image)
+    people = processFrame(image)
 
-    if customers is None:
+    if people is None or len(people)==0:
       return
 
     # print intersting stuff
@@ -497,7 +501,7 @@ def actionArmsRaisedSVM(pred_coords, upscale_bbox):
     
 
 
-def hackathon_action(image, pred_coords, class_IDs, bounding_boxs, scores, box_thresh=0.5):
+def hackathon_action(i,image, pred_coords, class_IDs, bounding_boxs, scores, box_thresh=0.5):
     """ 
         Infer action from those coords
         Steps:
@@ -521,7 +525,9 @@ def hackathon_action(image, pred_coords, class_IDs, bounding_boxs, scores, box_t
       pass
 
     try:
-      facepp_plugin(image)
+      global pause_time
+      if i % 1/pause_time == 0:
+        facepp_plugin(image)
     except  Exception:
       #print("Exception in user code:")
       #print("-"*60)
@@ -544,9 +550,10 @@ def hackathon_action(image, pred_coords, class_IDs, bounding_boxs, scores, box_t
 
 
 
-def keypoint_detection(frame, detector, pose_net, ctx=mx.cpu(), axes=None):
+def keypoint_detection(i,frame, detector, pose_net, ctx=mx.cpu(), axes=None):
     
-    pause_time = 0.4 #3.0 #0.001
+    global pause_time
+    
 
     x, img = gcv.data.transforms.presets.yolo.transform_test(frame, short=512, max_size=350)
     x = x.as_in_context(ctx)
@@ -557,7 +564,7 @@ def keypoint_detection(frame, detector, pose_net, ctx=mx.cpu(), axes=None):
                                                        output_shape=(128, 96), ctx=ctx)
 
     #print(pose_input,"\n")
-    if len(upscale_bbox) > 0:
+    if len(upscale_bbox) > 0 :
 
         predicted_heatmap = pose_net(pose_input)
         pred_coords, confidence = heatmap_to_coord(predicted_heatmap, upscale_bbox)
@@ -565,6 +572,7 @@ def keypoint_detection(frame, detector, pose_net, ctx=mx.cpu(), axes=None):
 
 
         hackathon_action(
+            i,
             frame,
             pred_coords, 
             confidence, 
@@ -593,6 +601,9 @@ if __name__ == '__main__':
 
     # action recognition model
     global loaded_model
+
+    global pause_time
+    pause_time = 0.3 #3.0 #0.001
     #filename = 'action_recognition_svm_local.sav'
     #loaded_model = pickle.load(open(filename, 'rb'))
 
@@ -610,7 +621,9 @@ if __name__ == '__main__':
     axes = None
 
     for i in range(opt.num_frames):
+
+
         ret, frame = cap.read()
 
         frame = mx.nd.array(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).astype('uint8')
-        axes = keypoint_detection(frame, detector, net, ctx, axes=axes)
+        axes = keypoint_detection(i,frame, detector, net, ctx, axes=axes)
