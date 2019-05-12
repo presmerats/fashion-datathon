@@ -310,9 +310,9 @@ def processFrame(image):
 def writeToDb(ethnicity , gender , emotion , outfit , action, coord):
 
 
-
+  dbfile = './server/data/demo.json'
   filedict = {}
-  with open('trackingCustomer.db','r') as f:
+  with open(dbfile, 'r') as f:
     filedict = json.load(f)
 
   global newid
@@ -340,7 +340,7 @@ def writeToDb(ethnicity , gender , emotion , outfit , action, coord):
   pprint(person)
   filedict["people"].append(person)
 
-  with open('trackingCustomer.db','w') as f:
+  with open(dbfile,'w') as f:
     json.dump(filedict,fp=f)
     
 
