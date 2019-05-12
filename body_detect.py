@@ -22,7 +22,6 @@ api_secret = os.environ["fpAPISecret"]
 globalTimeStep = 0 # track updates by timestep
 customers = [] # list of Customer Objects
 totalNumberCustomers = None
-facesetTokens = {} # used for faceSets
 
 # Represents a customer
 class Customer(object):
@@ -118,42 +117,6 @@ def get_bodies(filename):
     except Exception:
         print("Error")
 
-# Create a faceset for the PARAM: camera
-# facesets can contain 'tags' which can then be queried to return all faceset with that tag
-def create_faceSet(tags):
-
-    files = {
-        'api_key': (None, api_key),
-        'api_secret': (None, api_secret),
-        'tag': (None, 'person,'+tags),
-    }
-
-    try: # connection for POST
-        req = requests.post('https://api-us.faceplusplus.com/facepp/v3/faceset/create', files=files)
-        return json.loads(req.text)
-
-    except Exception:
-        print("Error")
-
-
-# Keeps track of faces in the Store across ALL cameras
-# used for TIME spent shopping PER customer
-# used for total COUNT of all customers in store
-#
-# called from get_faces
-# i) check if face exists -> compare API (tokens against FACESET)
-# ii) if not exist ADD new token
-def update_faceSet(faces):
-    for face in faces:
-        files = {
-            'api_key': (None, '<api_key>'),
-            'api_secret': (None, '<api_secret>'),
-            'face_token1': (None, 'c2fc0ad7c8da3af5a34b9c70ff764da0'),
-            'face_token2': (None, 'ad248a809408b6320485ab4de13fe6a9'),
-        }
-
-        response = requests.post('https://api-us.faceplusplus.com/facepp/v3/compare', files=files)
-
 # Process people takes all the new identified people (body/face pair) in the last frame
 # and will see if (based on position) this person is NEW or part of the last frame
 # IF new, then it will create a new customer record
@@ -167,16 +130,6 @@ def process_people(people):
 
     # # Filter customers to process (will only look for customers who were updates in that last timestep)
     # customers_prevFrame = [cust for customers if cust.last_update_time == globalTimeStep-1]
-
-    # # iterate through all the new people in frame
-    # for person in people:
-    #     body = person[1] # persons body
-    #     body_coords = body['humanbody_rectangle']
-    #     print(body['humanbody_rectangle'])
-        
-    #     check euclidean to people in 
-    #     for cust in customers:
-    #return 0
 
 # NOTE: we do not need to update at EVERY frame. To save time we will call updates every X
 # seconds and then use the intermediate time to process the result with Compare API etc.
@@ -203,8 +156,8 @@ def processFrame(filename='./frames/shopCouple.jpg'):
 #============ Program Start
 
 # create facesets to individualy track males and females
-facesetTokens['male'] = create_faceSet("male")["faceset_token"]
-facesetTokens['female'] = create_faceSet("female")["faceset_token"]
+# facesetTokens['male'] = create_faceSet("male")["faceset_token"]
+# facesetTokens['female'] = create_faceSet("female")["faceset_token"]
 
 numFrames = 5
 for i in range(1,numFrames+1):
