@@ -183,11 +183,12 @@ def process_people(people):
 def processFrame(filename='./frames/shopCouple.jpg'):
     global globalTimeStep
 
+    print(filename)
     globalTimeStep += 1
     faces = get_faces(filename)
-    #print(faces)
+    print(faces)
     bodies = get_bodies(filename)
-    #print(bodies)
+    print(bodies)
 
     # Update totalNumberCustomers
     totalNumberCustomers = len(bodies['humanbodies'])
@@ -205,9 +206,7 @@ def processFrame(filename='./frames/shopCouple.jpg'):
 facesetTokens['male'] = create_faceSet("male")["faceset_token"]
 facesetTokens['female'] = create_faceSet("female")["faceset_token"]
 
-count = 0
-for filename in os.listdir("./Retail/women01/"):
-    count += 1
-    processFrame("./Retail/women01/"+filename)
-    if count > 0:
-        break
+numFrames = 5
+for i in range(1,numFrames+1):
+    # padded to filenames of data set
+    processFrame("./Retail/women01/resized/"+str(i).rjust(5,"0")+".jpg")
