@@ -33,6 +33,10 @@ from gluoncv.data.transforms.pose import detector_to_simple_pose, heatmap_to_coo
 from gluoncv.utils.viz import plot_image, plot_keypoints
 
 
+import threading
+import time
+
+
 
 
 from PIL import Image
@@ -93,6 +97,9 @@ def match_faces_to_bodies(faces, bodies):
                 people.append((face,bodies[minIdx]))
                 # remove the matched body from body LIST
                 del bodies[minIdx]
+
+    if len(people)==0:
+      people.append((None,bodies[0]))
 
     return people
 
@@ -267,6 +274,10 @@ def processFrame(image):
     #print(faces[list(faces.keys())[1]])
     #print()
     bodies = get_bodies_(image)
+    if bodies is None:
+      bodies = {}
+    if faces is None:
+      faces = {}
     #print(bodies[list(faces.keys())[1]])
     #print(bodies.keys())
     #print()
@@ -286,7 +297,7 @@ def processFrame(image):
 
       # match the faces and bodies
       people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
-      print(people)
+      #print(people)
       #print("PEOPLE------------------")
       #process_people(people)
       return people
@@ -296,27 +307,59 @@ def processFrame(image):
 
 #===========plugin api
 
-def facepp_plugin(image):
-    
+def writeToDb(dbrecord):
+
+  with open('trackingCustomer.db','a') as f:
+
+    f.write(dbrecord)
+
+def facepp_plugin(image,action):
+
+    global api_ready
+    api_ready = False
     people = processFrame(image)
+    writeToDb("frame processed! with {} \n".format(len(people)))
+    api_ready = True
 
     if people is None or len(people)==0:
       return
 
     # print intersting stuff
-    for customer in customers:
-      face = customer[3][0]['attributes']
-      body = customer[3][1]['attributes']
-      outfit = body['lower_body_cloth']['lower_body_cloth_color'] + \
-        + "_" + \
-               body['upper_body_cloth']['upper_body_cloth_color'] 
-      ethnicity = face['ethnicity']['value']
-      gender = face['gender']['value']
-      emotions = [ v for k,v in face['emotion'].items()]
-      emotions_score = [ v for k,v in face['emotion'].items()]
-      emotion_max = np.argmax(emotions_score)
-      emotion = face['emotion'][emotions[emotion_max]]
-      print(face+ " "+ gender + " " + emotion + " " + outfit)
+    for customer in people:
+      
+      face = customer[0] 
+      body = customer[1]
+
+      if body is not None:
+
+        body = customer[1]['attributes']
+        outfit = str(body['lower_body_cloth']['lower_body_cloth_color']) + \
+           "_" + str(body['upper_body_cloth']['upper_body_cloth_color']) 
+      else:
+        outfit = "nude"
+
+      if face is not None:
+        face = customer[0]['attributes']
+        ethnicity = face['ethnicity']['value']
+        gender = face['gender']['value']
+        emotions = [ v for k,v in face['emotion'].items()]
+        emotions_score = [ v for k,v in face['emotion'].items()]
+        emotion_max = max(emotions_score)
+        emotion_i = emotions_score.index(emotion_max)
+        emotion = "coldice"
+        try:
+          emotion = face['emotion'][emotions[emotion_i]]
+        except:
+          pass
+      else:
+        ethnicity = "unknown"
+        outfit = "unknown"
+        emotion = "unknown"
+        gender = "angel"
+
+      dbrecord = ethnicity + " "+ gender + " " + emotion + " " + outfit + " action: "+ str(action) +"\n"
+      print(dbrecord)
+      writeToDb(dbrecord)
 
     
 
@@ -339,10 +382,7 @@ def facepp_plugin_setup():
     globalTimeStep = 0 # track updates by timestep
     customers = [] # list of Customer Objects
     totalNumberCustomers = None
-    facesetTokens = {} # used for faceSets
-    facesetTokens['male'] = create_faceSet("male")["faceset_token"]
-    facesetTokens['female'] = create_faceSet("female")["faceset_token"]
-
+    
     
 
 # arms raised function
@@ -482,23 +522,23 @@ def parseImage(imagepath):
   #print(pred_coords[0])
   return pred_coords[0]
 
-# arms raised function
-def actionArmsRaisedSVM(pred_coords, upscale_bbox):
+# # arms raised function
+# def actionArmsRaisedSVM(pred_coords, upscale_bbox):
    
-  # transform input data
-  global loaded_model
+#   # transform input data
+#   global loaded_model
   
 
     
-  poses_np =[ pred_coords.flatten()]
+#   poses_np =[ pred_coords.flatten()]
     
-  #print(poses_np)
+#   #print(poses_np)
   
-  #result = loaded_model.predict(poses_np)
-  #print(result)
-  
-  return result == 1
+#   #result = loaded_model.predict(poses_np)
+#   #print(result)
+#   return result == 1
     
+
 
 
 def hackathon_action(i,image, pred_coords, class_IDs, bounding_boxs, scores, box_thresh=0.5):
@@ -512,36 +552,45 @@ def hackathon_action(i,image, pred_coords, class_IDs, bounding_boxs, scores, box
 
     """
 
-    try:
-        detected_action2 = actionArmsRaisedSVM(pred_coords, bounding_boxs)
-        if detected_action2:
-            print(" Arms raised by SVM !")
-            print()
-    except  Exception:
-      #print("Exception in user code:")
-      #print("-"*60)
-      #traceback.print_exc(file=sys.stdout)
-      #print("-"*60)
-      pass
+    # try:
+    #     detected_action2 = actionArmsRaisedSVM(pred_coords, bounding_boxs)
+    #     if detected_action2:
+    #         print(" Arms raised by SVM !")
+    #         print()
+    # except  Exception:
+    #   #print("Exception in user code:")
+    #   #print("-"*60)
+    #   #traceback.print_exc(file=sys.stdout)
+    #   #print("-"*60)
+    #   pass
 
-    try:
-      global pause_time
-      if i % 1/pause_time == 0:
-        facepp_plugin(image)
-    except  Exception:
-      #print("Exception in user code:")
-      #print("-"*60)
-      traceback.print_exc(file=sys.stdout)
-      #print("-"*60)
-      pass
 
-    
     #print(pred_coords, class_IDs, bounding_boxs, scores, "\n")
     detected_action, x, y = actionArmsRaised(pred_coords, bounding_boxs)
     if detected_action:
         print(" Touching at ({}, {}) !".format(x[0],y[0]))
         pprint(pred_coords)
         print()
+
+    
+
+    try:
+      global pause_time
+      global api_ready
+      print(api_ready)
+      if i % int(50) == 0 and api_ready:
+        # attributes and outfit
+        x = threading.Thread(target=facepp_plugin, args=(image,detected_action))
+        x.start()
+        
+    except  Exception:
+      #print("Exception in user code:")
+      #print("-"*60)
+      traceback.print_exc(file=sys.stdout)
+      pass
+
+    
+
 
     
 
@@ -602,8 +651,11 @@ if __name__ == '__main__':
     # action recognition model
     global loaded_model
 
+    global api_ready
+    api_ready = True
+
     global pause_time
-    pause_time = 0.3 #3.0 #0.001
+    pause_time = 0.001 #3.0 #0.001
     #filename = 'action_recognition_svm_local.sav'
     #loaded_model = pickle.load(open(filename, 'rb'))
 
