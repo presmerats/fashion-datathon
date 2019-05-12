@@ -1,14 +1,17 @@
-$(function() {
+
+/*
+$(document).ready(function(){
+
     var promise = $.ajax({ timeout: 1000 });
 
-    promise.fail(function(jqXHR, textStatus) {
+    promise.done(function(jqXHR, textStatus) {
         if(textStatus==="timeout") {
-            url : '/api/calc?a=' + document.getElementById('a').value + '&b=' + document.getElementById('b').value,
+            url: 'localhost:5000/table',
             success: function(data) {
-                $('#add').html(data['a'] + ' + ' + data['b'] + ' = ' + data['add']);
-                $('#subtract').html(data['a'] + ' - ' + data['b'] + ' = ' + data['subtract']);
-                $('#multiply').html(data['a'] + ' * ' + data['b'] + ' = ' + data['multiply']);
-                $('#divide').html(data['a'] + ' / ' + data['b'] + ' = ' + data['divide']);
+                var table = document.getElementById("myTable");
+                data['people'].forEach(function(elem){
+                    console.log(elem);
+                });
             } 
         }
     });
@@ -21,19 +24,31 @@ $(function() {
             $('#description').html(data['description']);
         }
     });
- 
-    $('#calc').click(function() {
-        $('#info').css('display', "none");
-        $('#description').css('display', "none");
-        //console.log(url);
-        $.ajax({
-            url : '/api/calc?a=' + document.getElementById('a').value + '&b=' + document.getElementById('b').value,
+
+
+    $.ajax({
+            url : 'table',
             success: function(data) {
-                $('#add').html(data['a'] + ' + ' + data['b'] + ' = ' + data['add']);
-                $('#subtract').html(data['a'] + ' - ' + data['b'] + ' = ' + data['subtract']);
-                $('#multiply').html(data['a'] + ' * ' + data['b'] + ' = ' + data['multiply']);
-                $('#divide').html(data['a'] + ' / ' + data['b'] + ' = ' + data['divide']);
+                var table = document.getElementById("myTable");
+                data['people'].forEach(function(elem){
+                    console.log(elem)
+                });
             }
         });
-    });*/
-})
+*/
+    
+$(document).ready(function(){
+    $('#calc').click(function() {
+        console.log("Hello1");
+        $.ajax({
+            url: 'localhost:5000/table',
+            success: function(data) {
+                    console.log("Hello");
+                    /*var table = document.getElementById("myTable");
+                    data['people'].forEach(function(elem){
+                        console.log(elem);
+                    });*/
+            } 
+        });
+    });
+});
