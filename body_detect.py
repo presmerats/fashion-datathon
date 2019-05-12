@@ -145,7 +145,7 @@ def processFrame(filename='./frames/shopCouple.jpg'):
 
     # Update totalNumberCustomers
     totalNumberCustomers = len(bodies['humanbodies'])
-    print(totalNumberCustomers)
+    #print(totalNumberCustomers)
 
     # match the faces and bodies
     people = match_faces_to_bodies(faces['faces'], bodies['humanbodies'])
@@ -159,7 +159,9 @@ def processFrame(filename='./frames/shopCouple.jpg'):
 # facesetTokens['male'] = create_faceSet("male")["faceset_token"]
 # facesetTokens['female'] = create_faceSet("female")["faceset_token"]
 
-numFrames = 5
-for i in range(1,numFrames+1):
+startFrame = 1
+numFrames = 9
+for i in range(startFrame,startFrame+numFrames):
     # padded to filenames of data set
-    processFrame("./Retail/women01/resized/"+str(i).rjust(5,"0")+".jpg")
+    #processFrame("./Retail/women01/resized/"+str(i).rjust(5,"0")+".jpg")
+    processFrame("./products/"+str(i)+".png")
